@@ -1,32 +1,21 @@
-#define GLEW_STATIC
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "app/app.h"
-
+// #include <stdlib.h>
+// #include <stdio.h>
+#include <iostream>
 
 int main(void) {
-    
-    
-   
     /* Initialize the library */
     if (!glfwInit()) return -1;
 
-    
-    ParticleOfLifeApp::App* app = new ParticleOfLifeApp::App();
-
-    app->launch();
-
+    std::cout << "Hello World" << std::endl;
 
     // /* Create a windowed mode window and its OpenGL context */
-    // window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    // if (!window)
-    // {
-    //     glfwTerminate();
-    //     return -1;
-    // }
+    auto window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
 
     // /* Make the window's context current */
     // glfwMakeContextCurrent(window);

@@ -24,22 +24,19 @@ find_package(OpenGL REQUIRED)
 ### GLFW, GLEW
 SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation")
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/glfw)
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew/build/cmake)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew/build/cmake)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${CMAKE_SOURCE_DIR}/external/glfw/include
-    PUBLIC ${CMAKE_SOURCE_DIR}/external/glew/include
+    # PUBLIC ${CMAKE_SOURCE_DIR}/external/glew/include
 )
 
 target_link_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/external/glfw/src
+    # PRIVATE ${CMAKE_SOURCE_DIR}/external/glew/src
 )
 
-
-
-
 target_link_libraries(${PROJECT_NAME}
-    # GLEW::GLEW
-    glew32s
+    GLEW
     glfw
 )

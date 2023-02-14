@@ -1,8 +1,6 @@
 #pragma	once
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
+#include <windows.h>
+#include <GL/glut.h>  
 
 #include "gui/gui.h"
 
@@ -21,7 +19,7 @@ namespace ParticleOfLifeApp {
 		void draw(double /*dt*/);
 
 	protected:
-		GLFWwindow* window;
+		int window;
 		int width, height;
 		double mouseX = -1, mouseY = -1;
 		double preMouseX = mouseX, preMouseY = mouseY;

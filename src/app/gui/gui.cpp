@@ -1,5 +1,5 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <windows.h>
+#include <GL/glut.h>  
 
 #include "gui.h"
 

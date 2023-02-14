@@ -1,8 +1,5 @@
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <windows.h>
+#include <GL/glut.h>  
 
 #include "app.h"
 
@@ -20,12 +17,12 @@ App::App(int w, int h) :
 
 App::~App() {
  
-	glfwTerminate();
+	// glfwTerminate();
 }
 
 
 double App::getDeltaTime() {
-    return isPlaying ? glfwGetTime() - lastFrameTime : 0;
+    return isPlaying ? glutGet(GLUT_ELAPSED_TIME) / 1000 - lastFrameTime : 0;
 }
 
 void App::processEvents() {
@@ -37,75 +34,79 @@ void App::launch() {
     init("Particle of Life", false);
 
     /* App display setup */
-    gui = new AppGUI(window);
-    guiScale = (float) height / 1000;
+    // gui = new AppGUI(window);
+    // guiScale = (float) height / 1000;
 
 
-    lastFrameTime = glfwGetTime();
+    // lastFrameTime = glfwGetTime();
 
-	while (!glfwWindowShouldClose(window)) {
+	// while (!glfwWindowShouldClose(window)) {
 
-        preMouseX = mouseX;
-        preMouseY = mouseY;
+    //     preMouseX = mouseX;
+    //     preMouseY = mouseY;
              
 
-        /* Poll for and process events */
-        glfwPollEvents();
-        processEvents();
+    //     /* Poll for and process events */
+    //     glfwPollEvents();
+    //     processEvents();
 
 
-        /* Rendering */
-        double dt = getDeltaTime();
-        gui->setIO(dt, width, height);
-        draw(dt);
+    //     /* Rendering */
+    //     double dt = getDeltaTime();
+    //     gui->setIO(dt, width, height);
+    //     draw(dt);
 
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+    //     /* Swap front and back buffers */
+    //     glfwSwapBuffers(window);
 
-        lastFrameTime = glfwGetTime();
-	}
+    //     lastFrameTime = glfwGetTime();
+	// }
 }
 
 void App::init(const char* title, bool fullscreen) {
-    if (glewInit() != GLEW_OK) fprintf(stderr, "Error setting up GLEW");
-    else fprintf(stdout, "OpenGL Version: %s\n", glGetString(GL_VERSION));
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    
+    
+    glutCreateWindow("Particle of Life");
 
-    glfwDefaultWindowHints();
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    glfwWindowHint(GLFW_SAMPLES, 16);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
-    // Window Creation
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+    // glfwDefaultWindowHints();
+    // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    // glfwWindowHint(GLFW_SAMPLES, 16);
 
-    int monitorWidth = videoMode->width;
-    int monitorHeight = videoMode->height;
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
-    double f = 0.2;
-    windowPosX = (int)(f * monitorWidth / 2);
-    windowPosY = (int)(f * monitorHeight / 2);
-    windowWidth = (int)((1 - f) * monitorWidth);
-    windowHeight = (int)((1 - f) * monitorHeight);
+    // // Window Creation
+    // GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    // const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
 
-    width = windowWidth;
-    height = windowHeight;
+    // int monitorWidth = videoMode->width;
+    // int monitorHeight = videoMode->height;
 
-    fprintf(stdout, "width: %i, height: %i\n", width, height);
-    window = glfwCreateWindow(width, height, title, NULL, NULL);
+    // double f = 0.2;
+    // windowPosX = (int)(f * monitorWidth / 2);
+    // windowPosY = (int)(f * monitorHeight / 2);
+    // windowWidth = (int)((1 - f) * monitorWidth);
+    // windowHeight = (int)((1 - f) * monitorHeight);
 
-    glfwMakeContextCurrent(window);
+    // width = windowWidth;
+    // height = windowHeight;
 
-    glfwSwapInterval(1);  // Enable v-sync
+    // fprintf(stdout, "width: %i, height: %i\n", width, height);
+    // window = glfwCreateWindow(width, height, title, NULL, NULL);
 
-    // Make the window visible
-    glfwShowWindow(window);
+    // glfwMakeContextCurrent(window);
+
+    // glfwSwapInterval(1);  // Enable v-sync
+
+    // // Make the window visible
+    // glfwShowWindow(window);
 }
 
 

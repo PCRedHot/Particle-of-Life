@@ -35,27 +35,39 @@ find_package(OpenGL REQUIRED)
 # endif(NOT OPENGL_FOUND)
 # set(GL_LIBRARY GL GLU X11)
 
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
 
-## Submodules
-### GLFW, GLEW
-SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation")
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/glfw)
-# add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew/build/cmake)
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew)
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_SOURCE_DIR}/external/glfw/include
-    PUBLIC ${CMAKE_SOURCE_DIR}/external/glew/include
-)
-
-# target_link_directories(${PROJECT_NAME}
-#     PRIVATE ${CMAKE_SOURCE_DIR}/external/glfw/src
-#     PRIVATE ${CMAKE_SOURCE_DIR}/external/glew/src
-# )
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME}
-    libglew_static
-    glfw
+    ${OPENGL_LIBRARIES}
+    ${GLUT_LIBRARY}
+    glu32
+    opengl32
+    freeglut
 )
+
+# ## Submodules
+# ### GLFW, GLEW
+# SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation")
+# add_subdirectory(${CMAKE_SOURCE_DIR}/external/glfw)
+# # add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew/build/cmake)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/external/glew)
+
+# target_include_directories(${PROJECT_NAME}
+#     PUBLIC ${CMAKE_SOURCE_DIR}/external/glfw/include
+#     PUBLIC ${CMAKE_SOURCE_DIR}/external/glew/include
+# )
+
+# # target_link_directories(${PROJECT_NAME}
+# #     PRIVATE ${CMAKE_SOURCE_DIR}/external/glfw/src
+# #     PRIVATE ${CMAKE_SOURCE_DIR}/external/glew/src
+# # )
+
+# target_link_libraries(${PROJECT_NAME}
+#     libglew_static
+#     glfw
+# )
 
 

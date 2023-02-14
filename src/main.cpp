@@ -3,22 +3,33 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+
+#include "app/app.h"
+
 
 int main(void) {
+    
+    
+   
     /* Initialize the library */
-    if (!glfwInit()) return -1;
-    if (glewInit() != GLEW_OK) fprintf(stderr, "Error setting up GLEW");
-
-    std::cout << "Hello World" << std::endl;
-
-    // /* Create a windowed mode window and its OpenGL context */
-    auto window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
+    if (!glfwInit()) {
+        fprintf(stderr, "Error setting up GLFW");
         return -1;
     }
+
+    
+    ParticleOfLifeApp::App* app = new ParticleOfLifeApp::App();
+
+    app->launch();
+
+
+    // /* Create a windowed mode window and its OpenGL context */
+    // window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    // if (!window)
+    // {
+    //     glfwTerminate();
+    //     return -1;
+    // }
 
     // /* Make the window's context current */
     // glfwMakeContextCurrent(window);

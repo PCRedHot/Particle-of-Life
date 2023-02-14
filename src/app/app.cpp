@@ -1,18 +1,25 @@
 #include <windows.h>
 #include <GL/glut.h>  
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "app.h"
 
+ParticleOfLifeApp::App* currentInstance = nullptr;
+
+void drawCallback() {
+	currentInstance->drawLoop();
+}
+
+void setupDrawCallback(ParticleOfLifeApp::App* app) {
+	currentInstance = app;
+	::glutDisplayFunc(drawCallback);
+}
+
 using namespace ParticleOfLifeApp;
 
-App::App() : App(640, 480) {}        // Default Windown Size
+App::App() {
 
-App::App(int w, int h) :
-    width(w),
-    height(h)
-{
-
-	
 }
 
 App::~App() {
@@ -21,17 +28,24 @@ App::~App() {
 }
 
 
-double App::getDeltaTime() {
-    return isPlaying ? glutGet(GLUT_ELAPSED_TIME) / 1000 - lastFrameTime : 0;
+double App::tick() {
+    int curTime = glutGet(GLUT_ELAPSED_TIME);
+    int dt = curTime - lastFrameTime;
+    lastFrameTime = curTime;
+    return isPlaying ? dt / 1000 : 0;
 }
 
 void App::processEvents() {
 
 }
 
+
+
 void App::launch() {
     /* Initialize the library (in case) */
     init("Particle of Life", false);
+
+    glutMainLoop();
 
     /* App display setup */
     // gui = new AppGUI(window);
@@ -52,9 +66,9 @@ void App::launch() {
 
 
     //     /* Rendering */
-    //     double dt = getDeltaTime();
+    //     double dt = tick();
     //     gui->setIO(dt, width, height);
-    //     draw(dt);
+    //     drawLoop(dt);
 
 
     //     /* Swap front and back buffers */
@@ -66,39 +80,30 @@ void App::launch() {
 
 void App::init(const char* title, bool fullscreen) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    
+
     
     glutCreateWindow("Particle of Life");
 
+    // Window Creation
+    int monitorWidth = glutGet(GLUT_SCREEN_WIDTH);
+    int monitorHeight = glutGet(GLUT_SCREEN_HEIGHT);
 
+    double f = 0.2;
+    windowPosX = (int)(f * monitorWidth / 2);
+    windowPosY = (int)(f * monitorHeight / 2);
+    windowWidth = (int)((1 - f) * monitorWidth);
+    windowHeight = (int)((1 - f) * monitorHeight);
 
-    // glfwDefaultWindowHints();
-    // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    // glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    // glfwWindowHint(GLFW_SAMPLES, 16);
+    width = windowWidth;
+    height = windowHeight;
 
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+    fprintf(stdout, "width: %i, height: %i\n", width, height);
 
-    // // Window Creation
-    // GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    // const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+    glutInitWindowSize(windowWidth, windowHeight);
+    glutInitWindowPosition(windowPosX, windowPosY);
 
-    // int monitorWidth = videoMode->width;
-    // int monitorHeight = videoMode->height;
+    setupDrawCallback(this);    
 
-    // double f = 0.2;
-    // windowPosX = (int)(f * monitorWidth / 2);
-    // windowPosY = (int)(f * monitorHeight / 2);
-    // windowWidth = (int)((1 - f) * monitorWidth);
-    // windowHeight = (int)((1 - f) * monitorHeight);
-
-    // width = windowWidth;
-    // height = windowHeight;
-
-    // fprintf(stdout, "width: %i, height: %i\n", width, height);
     // window = glfwCreateWindow(width, height, title, NULL, NULL);
 
     // glfwMakeContextCurrent(window);
@@ -110,8 +115,20 @@ void App::init(const char* title, bool fullscreen) {
 }
 
 
-void App::draw(double dt) {
+void App::drawLoop() {
+    double dt = tick();
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+    glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
+    // Draw a Red 1x1 Square centered at origin
+    glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
+        glColor3f(1.0f, 0.0f, 0.0f); // Red
+        glVertex2f(-0.5f, -0.5f);    // x, y
+        glVertex2f( 0.5f, -0.5f);
+        glVertex2f( 0.5f,  0.5f);
+        glVertex2f(-0.5f,  0.5f);
+    glEnd();
 
+    glutSwapBuffers();    
 }

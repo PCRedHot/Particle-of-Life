@@ -9,7 +9,7 @@ namespace ParticleOfLifeApp {
 		public:
 			~AppGUI();
 
-			AppGUI(const GLFWwindow*);
+			AppGUI(const int /*window id*/);
 
 			void scaleGui(float /*scale*/);
 			void setIO(double /*dt*/, int /*width*/, int /*height*/);

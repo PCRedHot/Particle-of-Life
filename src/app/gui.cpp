@@ -5,7 +5,7 @@
 
 using namespace ParticleOfLifeApp;
 
-AppGUI::AppGUI(const GLFWwindow* window) {
+AppGUI::AppGUI(const int window) {
 
 }
 

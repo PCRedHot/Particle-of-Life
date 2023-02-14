@@ -1,8 +1,10 @@
-#pragma	once
+#ifndef APP_H
+#define APP_H
+
 #include <windows.h>
 #include <GL/glut.h>  
 
-#include "gui/gui.h"
+#include "gui.h"
 
 namespace ParticleOfLifeApp {
 	class App {
@@ -10,13 +12,13 @@ namespace ParticleOfLifeApp {
 		~App();
 
 		App();
-		App(int /*width*/, int /*height*/);
 
 		void launch();
 		
-		double getDeltaTime();
+		
+		double tick();
 		void processEvents();
-		void draw(double /*dt*/);
+		void drawLoop();
 
 	protected:
 		int window;
@@ -34,13 +36,24 @@ namespace ParticleOfLifeApp {
 			
 		// Simulation State
 		bool isPlaying = false;
-		double lastFrameTime = -1;
+		int lastFrameTime = -1;
 	
 	private:
+		
+
 		void init(const char* /*title*/, bool /*fullscreen*/);
 		
 		double zoom = 1;
-		//glm::
 		
 	};
+
+	
 }
+
+
+extern ParticleOfLifeApp::App* currentInstance;
+
+void drawCallback();
+void setupDrawCallback(ParticleOfLifeApp::App*);
+
+#endif

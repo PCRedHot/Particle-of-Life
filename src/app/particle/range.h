@@ -4,10 +4,10 @@
 
 namespace ParticleOfLife {
 
-    static class Range {
+    class Range {
         public:
             static void wrap(glm::dvec2& /*v*/);
             static double wrap(double /*v*/);
 
-    }
+    };
 }

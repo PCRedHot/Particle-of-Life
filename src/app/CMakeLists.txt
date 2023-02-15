@@ -10,7 +10,7 @@
 #     PUBLIC ${CMAKE_CURRENT_LIST_DIR}
 # )
 
-add_subdirectory(particle)
+add_subdirectory(physics)
 
 # target_sources(${PROJECT_NAME}
 #     PRIVATE ${CMAKE_CURRENT_LIST_DIR}/app.cpp

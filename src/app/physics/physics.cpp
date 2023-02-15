@@ -4,6 +4,7 @@
 #include <random>
 #include <glm/vec2.hpp>
 
+#include "range.h"
 #include "particle.h"
 #include "physics.h"
 #include "interaction_matrix.h"
@@ -52,9 +53,9 @@ PhysicsEngine::PhysicsEngine() {
     particles = std::vector<Particle>();
 }
 
-PhysicsEngine::~PhysicsEngine() {
-    // delete[] particles;
-}
+// PhysicsEngine::~PhysicsEngine() {
+//     // delete[] particles;
+// }
 
 
 void PhysicsEngine::calculateNxNy() {
@@ -81,11 +82,15 @@ void PhysicsEngine::setParticleCount(int num) {
 }
 
 void PhysicsEngine::simulate(double dt) {
+    fprintf(stdout, "Simulating");
     makeGrid();
 
     int nParticle = particles.size();
-    #pragma omp parallel for
+    // Update Velocity
+    // #pr agma om p parallel for
     for (int i = 0; i < nParticle; i++) {
+
+        fprintf(stdout, "Simulating Particle %i", i);
         Particle p = particles[i];
 
         // Friction
@@ -115,11 +120,35 @@ void PhysicsEngine::simulate(double dt) {
 
                 Particle q = particles[j];
 
-                // glm::dvec2 relativePos =    
-                // TODO
+                glm::dvec2 relativePos = getRelativePosition(p.position, q.position);   
+                
+                double mag = relativePos.length();
+                if (mag > 0 && mag <= setting.rMax) {
+                    relativePos /= setting.rMax;    // Scale for apply acceleration
+                    glm::dvec2 dv = ParticleOfLife::Physics::accelerate(setting.interactionMatrix.getType(p.type, q.type), setting.interactionMatrix.getValue(p.type, q.type), relativePos);
+                    p.velocity += dv * (setting.rMax * setting.forceScale * dt);
+                }
             }
         }        
     }
+
+    fprintf(stdout, "Simulating 50%");
+
+    // Update Position
+    // #pr agma om p parallel for
+    for (int i = 0; i < nParticle; i++) {
+        Particle p = particles[i];
+        p.position += p.velocity * dt;
+
+        // Ensure Position
+        if (setting.wrap) {
+            Range::wrap(p.position);
+        } else {
+            Range::clamp(p.position);
+        }
+    }
+
+    fprintf(stdout, "Simulated");
 }
 
 double PhysicsEngine::getFrictionFactor(double dt) {
@@ -127,6 +156,16 @@ double PhysicsEngine::getFrictionFactor(double dt) {
     if (setting.velocityHalfLife == std::numeric_limits<double>::infinity()) return 1.0;
 
     return pow(0.5, dt / setting.velocityHalfLife);
+}
+
+glm::dvec2 PhysicsEngine::getRelativePosition(glm::dvec2 from, glm::dvec2 to) {
+    glm::dvec2 dv = to - from;
+
+    if (setting.wrap) {
+        Range::wrap(dv);
+    }
+
+    return dv;
 }
 
 void PhysicsEngine::makeGrid() {        // Put particles in the same grid together!
@@ -175,9 +214,9 @@ int PhysicsEngine::getGridIndex(glm::dvec2 pos) {
 }
 
 void PhysicsEngine::shuffleParticle() {
-    auto rd = std::random_device {}; 
-    auto rng = std::default_random_engine { rd() };
-    std::shuffle(std::begin(particles), std::end(particles), rng);
+    // auto rd = std::random_device {}; 
+    // auto rng = std::default_random_engine { rd() };
+    std::shuffle(std::begin(particles), std::end(particles), std::random_device());
 }
 
 int PhysicsEngine::wrapGrid(int c, int n) {

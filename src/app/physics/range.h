@@ -8,6 +8,9 @@ namespace ParticleOfLife {
         public:
             static void wrap(glm::dvec2& /*v*/);
             static double wrap(double /*v*/);
+            
+            static void clamp(glm::dvec2& /*v*/);
+            static double clamp(double /*v*/);
 
     };
 }

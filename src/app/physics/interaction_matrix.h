@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <memory>
+#include "accelerator.h"
 
 namespace ParticleOfLife {
     namespace Physics {
@@ -11,8 +11,11 @@ namespace ParticleOfLife {
                 ~InteractionMatrix();
 
                 int size();
-                double get(int /*i*/, int /*j*/);
-                void set(int /*i*/, int /*j*/, double /*v*/);
+                double getValue(int /*i*/, int /*j*/);
+                AccelerateType getType(int /*i*/, int /*j*/);
+
+                void setValue(int /*i*/, int /*j*/, double /*v*/);
+                void setType(int /*i*/, int /*j*/, AccelerateType /*v*/);
                 void randomize(double /*maxMag*/);
 
                 InteractionMatrix deepCopy();
@@ -25,6 +28,7 @@ namespace ParticleOfLife {
                 int n; // size
 
                 double **values;
+                AccelerateType **types;
         };
     }
 }

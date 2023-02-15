@@ -31,7 +31,7 @@ namespace ParticleOfLife {
         class PhysicsEngine {
             public:
                 PhysicsEngine();
-                ~PhysicsEngine();
+                // ~PhysicsEngine();
 
                 PhysicsSetting setting; // Setting of the physics rules
                 std::vector<Particle> particles;    // List of particles
@@ -47,7 +47,7 @@ namespace ParticleOfLife {
             private:
                 // Grid Buffers
                 std::vector<int> grids;
-                const glm::ivec2 gridNeighborhood[9] {
+                glm::ivec2 gridNeighborhood[9] {
                     glm::ivec2(-1, -1),
                     glm::ivec2( 0, -1),
                     glm::ivec2( 1, -1),
@@ -74,7 +74,7 @@ namespace ParticleOfLife {
                 
                 double getFrictionFactor(double /*dt*/);
 
-
+                glm::dvec2 getRelativePosition(glm::dvec2 /*from*/, glm::dvec2 /*to*/); // to - from
                 void shuffleParticle();
                 int wrapGrid(int /*calculated*/, int /*bound*/);
         };

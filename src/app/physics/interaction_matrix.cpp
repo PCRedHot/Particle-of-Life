@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <random>
 
+#include "accelerator.h"
 #include "interaction_matrix.h"
 
 using namespace ParticleOfLife::Physics;
@@ -14,28 +15,40 @@ InteractionMatrix::InteractionMatrix() : InteractionMatrix::InteractionMatrix(1)
 InteractionMatrix::InteractionMatrix(int size) {
     this->n = size;
     values = new double*[n];
+    types = new AccelerateType*[n];
     for (int i = 0; i < n; i++) {
         values[i] = new double[n];
+        types[i] = new AccelerateType[n];
     }
 }
 
 InteractionMatrix::~InteractionMatrix() {
     for (int i = 0; i < n; i++) {
         delete[] values[i];
+        delete[] types[i];
     }
     delete[] values;
+    delete[] types;
 }
 
 int InteractionMatrix::size() {
     return n;
 }
 
-double InteractionMatrix::get(int i, int j) {
+double InteractionMatrix::getValue(int i, int j) {
     return values[i][j];
 }
 
-void InteractionMatrix::set(int i, int j, double v) {
+void InteractionMatrix::setValue(int i, int j, double v) {
     values[i][j] = v;
+}
+
+AccelerateType InteractionMatrix::getType(int i, int j) {
+    return types[i][j];
+}
+
+void InteractionMatrix::setType(int i, int j, AccelerateType v) {
+    types[i][j] = v;
 }
 
 void InteractionMatrix::randomize(double maxMag) {
@@ -43,6 +56,7 @@ void InteractionMatrix::randomize(double maxMag) {
         for (int j = 0; j < n; j++) {
             // values[i][j] = -maxMag + (rand() % static_cast<int>(2 * maxMag + 1));
             values[i][j] = -maxMag + 2 * maxMag * (double) rand() / RAND_MAX;
+            types[i][j] = AccelerateType::UNIFORM;
         }
     }
 }
@@ -52,7 +66,8 @@ InteractionMatrix InteractionMatrix::deepCopy() {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            rtnCopy.set(i, j, get(i, j));
+            rtnCopy.setValue(i, j, getValue(i, j));
+            rtnCopy.setType(i, j, getType(i, j));
         }
     }
     
@@ -79,7 +94,8 @@ InteractionMatrix InteractionMatrix::extract(int *indices){
             });
             if (!existsJ) continue;
 
-            rtnMatrix.set(ni, nj, get(i, j));
+            rtnMatrix.setValue(ni, nj, getValue(i, j));
+            rtnMatrix.setType(ni, nj, getType(i, j));
 
             nj += 1;
         }
@@ -94,7 +110,8 @@ bool InteractionMatrix::operator==(InteractionMatrix o) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            if (get(i, j) != o.get(i, j)) return false;
+            if (getValue(i, j) != o.getValue(i, j)) return false;
+            if (getType(i, j) != o.getType(i, j)) return false;
         }
     }
 

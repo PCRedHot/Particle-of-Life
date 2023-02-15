@@ -4,6 +4,7 @@
 #include <GL/freeglut.h>
 
 #include "gui.h"
+#include "physics/physics.h"
 
 namespace ParticleOfLifeApp {
 	class App {
@@ -11,6 +12,8 @@ namespace ParticleOfLifeApp {
 		~App();
 
 		App();
+
+		ParticleOfLife::Physics::PhysicsEngine physicsEngine;
 
 		void launch();
 		

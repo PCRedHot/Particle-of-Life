@@ -1,5 +1,6 @@
-#include <windows.h>
-#include <GL/glut.h>  
+// #include <windows.h>
+#include <GL/freeglut.h>
+#include <glm/vec3.hpp>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -7,14 +8,22 @@
 
 ParticleOfLifeApp::App* currentInstance = nullptr;
 
+void setCurrentInstance(ParticleOfLifeApp::App* app) {
+	currentInstance = app;
+}
+
 void drawCallback() {
 	currentInstance->drawLoop();
 }
 
-void setupDrawCallback(ParticleOfLifeApp::App* app) {
-	currentInstance = app;
-	::glutDisplayFunc(drawCallback);
+void keyboardNormalCallback(unsigned char key, int x, int y) {
+    currentInstance->onPressNormalKey(key, x, y);
 }
+
+void keyboardSpecialCallback(int key, int x, int y) {
+    currentInstance->onPressSpecialKey(key, x, y);
+}
+
 
 using namespace ParticleOfLifeApp;
 
@@ -24,7 +33,6 @@ App::App() {
 
 App::~App() {
  
-	// glfwTerminate();
 }
 
 
@@ -35,9 +43,6 @@ double App::tick() {
     return isPlaying ? dt / 1000 : 0;
 }
 
-void App::processEvents() {
-
-}
 
 
 
@@ -47,42 +52,13 @@ void App::launch() {
 
     glutMainLoop();
 
-    /* App display setup */
-    // gui = new AppGUI(window);
-    // guiScale = (float) height / 1000;
-
-
-    // lastFrameTime = glfwGetTime();
-
-	// while (!glfwWindowShouldClose(window)) {
-
-    //     preMouseX = mouseX;
-    //     preMouseY = mouseY;
-             
-
-    //     /* Poll for and process events */
-    //     glfwPollEvents();
-    //     processEvents();
-
-
-    //     /* Rendering */
-    //     double dt = tick();
-    //     gui->setIO(dt, width, height);
-    //     drawLoop(dt);
-
-
-    //     /* Swap front and back buffers */
-    //     glfwSwapBuffers(window);
-
-    //     lastFrameTime = glfwGetTime();
-	// }
 }
 
 void App::init(const char* title, bool fullscreen) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
     
-    glutCreateWindow("Particle of Life");
+    
 
     // Window Creation
     int monitorWidth = glutGet(GLUT_SCREEN_WIDTH);
@@ -97,12 +73,20 @@ void App::init(const char* title, bool fullscreen) {
     width = windowWidth;
     height = windowHeight;
 
-    fprintf(stdout, "width: %i, height: %i\n", width, height);
+    fprintf(stdout, "screen - width: %i, height: %i, x: %i, y: %i\n", monitorWidth, monitorHeight, windowPosX, windowPosY);
+    fprintf(stdout, "window - width: %i, height: %i\n", width, height);
 
-    glutInitWindowSize(windowWidth, windowHeight);
+    glutInitWindowSize(width, height);
     glutInitWindowPosition(windowPosX, windowPosY);
+    
 
-    setupDrawCallback(this);    
+    glutCreateWindow(title);
+    // glutFullScreen();
+
+    setCurrentInstance(this);
+    ::glutDisplayFunc(drawCallback);
+    ::glutKeyboardFunc(keyboardNormalCallback);
+    ::glutSpecialFunc(keyboardSpecialCallback);
 
     // window = glfwCreateWindow(width, height, title, NULL, NULL);
 
@@ -118,6 +102,8 @@ void App::init(const char* title, bool fullscreen) {
 void App::drawLoop() {
     double dt = tick();
 
+    
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
@@ -131,4 +117,14 @@ void App::drawLoop() {
     glEnd();
 
     glutSwapBuffers();    
+}
+
+void App::onPressNormalKey(unsigned char key, int x, int y) {
+    fprintf(stdout, "Normal Pressed: %u (%i, %i)\n", key, x, y);
+
+    if (key == 27) glutLeaveMainLoop();
+}
+
+void App::onPressSpecialKey(int key, int x, int y) {
+    fprintf(stdout, "Special Pressed: %i (%i, %i)\n", key, x, y);
 }

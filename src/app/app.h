@@ -1,8 +1,7 @@
-#ifndef APP_H
-#define APP_H
+#pragma	once
 
-#include <windows.h>
-#include <GL/glut.h>  
+// #include <windows.h>
+#include <GL/freeglut.h>
 
 #include "gui.h"
 
@@ -17,7 +16,11 @@ namespace ParticleOfLifeApp {
 		
 		
 		double tick();
-		void processEvents();
+		// void processEvents();
+
+		void onPressNormalKey(unsigned char /*key*/, int /*x*/, int /*y*/);
+		void onPressSpecialKey(int /*key*/, int /*x*/, int /*y*/);
+
 		void drawLoop();
 
 	protected:
@@ -53,7 +56,10 @@ namespace ParticleOfLifeApp {
 
 extern ParticleOfLifeApp::App* currentInstance;
 
-void drawCallback();
-void setupDrawCallback(ParticleOfLifeApp::App*);
+void setCurrentInstance(ParticleOfLifeApp::App*);
 
-#endif
+void drawCallback();
+void keyboardNormalCallback(unsigned char /*key*/, int /*x*/, int /*y*/);
+void keyboardSpecialCallback(int /*key*/, int /*x*/, int /*y*/);
+// void setupDrawCallback();
+

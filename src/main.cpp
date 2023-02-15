@@ -1,6 +1,7 @@
-#include <windows.h>  // For MS Windows
-#include <GL/glut.h>  // GLUT, includes glu.h and gl.h
- 
+#include <GL/freeglut.h>
+#include <thread>
+#include <omp.h>
+
 #include "app.h"
 
 // void display() {
@@ -22,6 +23,8 @@
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
     glutInit(&argc, argv);                 // Initialize GLUT
+    const auto processor_count = std::thread::hardware_concurrency();
+    omp_set_num_threads(processor_count);
 
     ParticleOfLifeApp::App* app = new ParticleOfLifeApp::App();
     app->launch();

@@ -1,5 +1,5 @@
-#include <windows.h>
-#include <GL/glut.h>  
+// #include <windows.h>
+#include <GL/freeglut.h>
 
 #include "gui.h"
 

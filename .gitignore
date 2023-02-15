@@ -14,3 +14,4 @@ _deps
 
 # Project
 out/*
+.vscode/settings.json

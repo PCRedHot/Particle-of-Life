@@ -13,7 +13,7 @@ namespace ParticleOfLife {
                 PhysicsSetting();
                 ~PhysicsSetting();
 
-                InteractionMatrix interactionMatrix = InteractionMatrix(TYPE_SIZE);
+                InteractionMatrix interactionMatrix = InteractionMatrix(DEFAULT_TYPE_SIZE);
                 double rMax = 0.04;
                 double velocityHalfLife = 0.043;
                 double forceScale = 1.0;
@@ -24,8 +24,12 @@ namespace ParticleOfLife {
                 bool operator==(PhysicsSetting /*o*/);
                 bool operator!=(PhysicsSetting /*o*/);
 
+                int typeCount = DEFAULT_TYPE_SIZE;
+
+                std::vector<float*> typeColour;
+
             private:
-                static const int TYPE_SIZE = 7;
+                static const int DEFAULT_TYPE_SIZE = 7;
         };
 
         class PhysicsEngine {

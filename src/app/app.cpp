@@ -3,7 +3,11 @@
 #include <glm/vec3.hpp>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
 
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glut.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 #include "app.h"
 #include "physics/physics.h"
 #include "physics/particle.h"
@@ -22,15 +26,13 @@ void idleCallback() {
 	currentInstance->idleLoop();
 }
 
+void mouseCallback(int button, int state, int x, int y) {
+	currentInstance->onMouse(button, state, x, y);
+}
+
 void reshapeCallback(int width, int height) {
-    currentInstance->width = width;
-    currentInstance->height = height;
-    // int size = std::min(width, height);
-
-    // int x = (size - width) / 2;
-    // int y = (size - height) / 2;
-
-    // glViewport(x, y, size, size);
+    currentInstance->windowWidth = width;
+    currentInstance->windowHeight = height;
 }
 
 void keyboardNormalCallback(unsigned char key, int x, int y) {
@@ -74,10 +76,14 @@ void App::launch() {
     // fprintf(stdout, "Launching Init done\n");
     
     glutMainLoop();
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGLUT_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void App::init(const char* title, bool fullscreen) {
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_MULTISAMPLE);
     // glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
     // Window Creation
@@ -90,13 +96,13 @@ void App::init(const char* title, bool fullscreen) {
     windowWidth = (int)((1 - f) * monitorWidth);
     windowHeight = (int)((1 - f) * monitorHeight);
 
-    width = windowWidth;
-    height = windowHeight;
+    // boxWidth = windowWidth;
+    // boxHeight = windowHeight;
 
-    fprintf(stdout, "screen - width: %i, height: %i, x: %i, y: %i\n", monitorWidth, monitorHeight, windowPosX, windowPosY);
+    // fprintf(stdout, "screen - width: %i, height: %i, x: %i, y: %i\n", monitorWidth, monitorHeight, windowPosX, windowPosY);
     // fprintf(stdout, "window - width: %i, height: %i\n", width, height);
 
-    glutInitWindowSize(width, height);
+    glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(windowPosX, windowPosY);
     
     glutCreateWindow(title);
@@ -106,59 +112,75 @@ void App::init(const char* title, bool fullscreen) {
     ::glutDisplayFunc(drawCallback);
     ::glutIdleFunc(idleCallback);
     ::glutReshapeFunc(reshapeCallback);
+    ::glutMouseFunc(mouseCallback);
     ::glutKeyboardFunc(keyboardNormalCallback);
     ::glutSpecialFunc(keyboardSpecialCallback);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGLUT_Init();
+    ImGui_ImplOpenGL3_Init();
+
+    ImGui_ImplGLUT_InstallFuncs();
 }
 
 void App::drawLoop() {
-    // fprintf(stdout, "Drawing %i Particles\n", (int) physicsEngine->particles.size());
-    int size = std::min(width, height);
+     // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGLUT_NewFrame();
 
-    int x = (width - size) / 2;
-    int y = (height - size) / 2;
+    {   // GUI
+        ImGui::SetNextWindowSize(ImVec2(500, 0));
+        ImGui::Begin("Controls");
 
-    glViewport(x, y, size, size);
+        ImGui::Text("Types:");
+        
+        for (int i = 0; i < physicsEngine->setting.typeCount; i++) {
+            if (ImGui::Button("X")) {}
+            ImGui::SameLine();
+            ImGui::ColorEdit3(std::to_string(i).c_str(), physicsEngine->setting.typeColour[i]);
+        }
+        ImVec2 v = ImGui::GetWindowSize();  // v = {32, 48} ,   is tool small
+ImGui::Text("%f %f", v.x, v.y);
+if (ImGui::GetFrameCount() < 10)
+    printf("Frame %d: Size %f %f\n", ImGui::GetFrameCount(), v.x, v.y);
+ImGui::End();
+    }
+
+    // Rendering
+    ImGui::Render();
+    ImGuiIO& io = ImGui::GetIO();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
-    // Draw a Red 1x1 Square centered at origin
-    int width = glutGet(GLUT_WINDOW_WIDTH);
-    int height = glutGet(GLUT_WINDOW_HEIGHT);
-    float r = 3.0f;
+    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+    // fprintf(stdout, "Drawing %i Particles\n", (int) physicsEngine->particles.size());
+    windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+    int size = std::min(windowWidth, windowHeight);
+
+    int x = (windowWidth - size) / 2;
+    int y = (windowHeight - size) / 2;
+
+    glViewport(x, y, size, size);
+
     
-    float rdx = r / width;
-    float rdy = r / height;
 
     glBegin(GL_POINTS);
     for (int i = 0; i < physicsEngine->particles.size(); i++) {
         ParticleOfLife::Particle p = physicsEngine->particles[i];
-        switch (p.type) {
-            default:
-            case 0:
-                glColor3f(1.0f, 1.0f, 1.0f);
-                break;
-            case 1:
-                glColor3f(1.0f, 1.0f, 0.0f);
-                break;
-            case 2:
-                glColor3f(1.0f, 0.0f, 1.0f);
-                break;
-            case 3:
-                glColor3f(0.0f, 1.0f, 1.0f);
-                break;
-            case 4:
-                glColor3f(1.0f, 0.0f, 0.0f);
-                break;
-            case 5:
-                glColor3f(0.0f, 1.0f, 0.0f);
-                break;
-            case 6:
-                glColor3f(0.0f, 0.0f, 1.0f);
-                break;
-        }
-
+        float* colour = physicsEngine->setting.typeColour[p.type];
+        glColor3f(colour[0], colour[1], colour[3]);
         glVertex2d(p.position.x, p.position.y);        
     }
     glEnd();
@@ -180,6 +202,16 @@ void App::idleLoop() {
     }
     
     glutPostRedisplay();
+}
+
+
+void App::onMouse(int button, int state, int x, int y) {
+	fprintf(stdout, "Mouse Wheel: %i, %i, %i, %i\n", button, state, x, y);
+    
+
+    // zoom += direction * 0.1;
+    // zoom = std::max(zoom, minZoom);    
+    // zoom = std::min(zoom, maxZoom);    
 }
 
 void App::onPressNormalKey(unsigned char key, int x, int y) {

@@ -14,6 +14,13 @@ using namespace ParticleOfLife::Physics;
 
 PhysicsSetting::PhysicsSetting() {
     interactionMatrix.randomize(1);
+    typeColour.push_back(new float[3]{1.0f, 1.0f, 1.0f});
+    typeColour.push_back(new float[3]{1.0f, 1.0f, 0.0f});
+    typeColour.push_back(new float[3]{1.0f, 0.0f, 1.0f});
+    typeColour.push_back(new float[3]{0.0f, 1.0f, 1.0f});
+    typeColour.push_back(new float[3]{1.0f, 0.0f, 0.0f});
+    typeColour.push_back(new float[3]{0.0f, 1.0f, 0.0f});
+    typeColour.push_back(new float[3]{0.0f, 0.0f, 1.0f});
 }
 
 PhysicsSetting::~PhysicsSetting() {
@@ -71,7 +78,7 @@ void PhysicsEngine::generateInteractionMatrix() {
 }
 
 int PhysicsEngine::getTypeCount() {
-    return setting.interactionMatrix.size();
+    return setting.typeCount;
 }
 
 void PhysicsEngine::setParticleCount(int num) {

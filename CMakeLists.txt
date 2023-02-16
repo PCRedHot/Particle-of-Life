@@ -12,12 +12,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
   ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-add_executable(${PROJECT_NAME} src/main.cpp)
-
-# Link src files
-add_subdirectory(src)
-
 # Linking Packages / Libraries
 if (POLICY CMP0072)
     set(OpenGL_GL_PREFERENCE GLVND)
@@ -35,9 +29,35 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+# file(GLOB IMGUI_SRC
+#   include/imgui/*.h
+#   include/imgui/*.cpp
+# )
+
+# file(GLOB PLATFORM_SRC
+#   include/imgui/backends/imgui_impl_opengl3.*
+#   include/imgui/backends/imgui_glut.*
+# )
+
+# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Iinclude/imgui -Iinclude/imgui/backends")
+
+# add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLUT)
+
+# message(NOTICE ${IMGUI_SRC})
+# message(NOTICE ${PLATFORM_SRC})
+# add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC} ${PLATFORM_SRC})
+add_executable(${PROJECT_NAME} src/main.cpp)
+
+# Link src files
+add_subdirectory(src)
+
+
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${OPENGL_INCLUDE_DIRS}
     PUBLIC ${GLUT_INCLUDE_DIRS}
+    # PUBLIC include/imgui
+    # PUBLIC include/imgui/backends
 )
 
 
@@ -55,5 +75,6 @@ target_link_libraries(${PROJECT_NAME}
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARY}
   glm::glm
+  
 )
 # endif (WIN32)

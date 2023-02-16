@@ -11,6 +11,7 @@
 # )
 
 add_subdirectory(physics)
+add_subdirectory(imgui)
 
 # target_sources(${PROJECT_NAME}
 #     PRIVATE ${CMAKE_CURRENT_LIST_DIR}/app.cpp

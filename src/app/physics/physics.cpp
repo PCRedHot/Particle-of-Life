@@ -89,7 +89,7 @@ void PhysicsEngine::simulate(double dt) {
 
     int nParticle = particles.size();
     // Update Velocity
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(6)
     for (int i = 0; i < nParticle; i++) {
         Particle* p = &particles[i];
 
@@ -134,7 +134,7 @@ void PhysicsEngine::simulate(double dt) {
     }
 
     // Update Position
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(6)
     for (int i = 0; i < nParticle; i++) {
         Particle* p = &particles[i];
         p->position += p->velocity * dt;

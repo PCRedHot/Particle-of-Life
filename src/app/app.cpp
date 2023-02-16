@@ -16,42 +16,21 @@ void setCurrentInstance(ParticleOfLifeApp::App* app) {
 
 void drawCallback() {
 	currentInstance->drawLoop();
-    // glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-    // glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
-
-    // // Draw a Red 1x1 Square centered at origin
-    // int width = glutGet(GLUT_WINDOW_WIDTH);
-    // int height = glutGet(GLUT_WINDOW_HEIGHT);
-    // float r = 3.0f;
-    
-    // float rdx = r / width;
-    // float rdy = r / height;
-
-    // glBegin(GL_POINTS);
-    // for (ParticleOfLife::Particle p : currentInstance->physicsEngine->particles) {
-    //     glVertex2d(p.position.x, p.position.y);        
-    // }
-    // glEnd();
-
-
-    // glFlush();
-    // glutSwapBuffers();  
 }
 
 void idleCallback() {
 	currentInstance->idleLoop();
+}
 
-    // double dt = currentInstance->tick();
+void reshapeCallback(int width, int height) {
+    currentInstance->width = width;
+    currentInstance->height = height;
+    // int size = std::min(width, height);
 
-    // try {
-    //     fprintf(stdout, "Simulating dt = %f... ", dt);
-    //     currentInstance->physicsEngine->simulate(dt);
-    //     fprintf(stdout, "Done\n");
-    // } catch (...) {
-    //     fprintf(stderr, "ERROR when simulating\n");
-    // }
-    
-    // glutPostRedisplay();
+    // int x = (size - width) / 2;
+    // int y = (size - height) / 2;
+
+    // glViewport(x, y, size, size);
 }
 
 void keyboardNormalCallback(unsigned char key, int x, int y) {
@@ -69,7 +48,7 @@ App::App() {
     fprintf(stdout, "Making App\n");
     // fprintf(stdout, "Making physicsEngine\n");
     physicsEngine = new ParticleOfLife::Physics::PhysicsEngine();
-    physicsEngine->setParticleCount(30000);
+    physicsEngine->setParticleCount(40000);
 }
 
 App::~App() {
@@ -105,8 +84,6 @@ void App::init(const char* title, bool fullscreen) {
     int monitorWidth = glutGet(GLUT_SCREEN_WIDTH);
     int monitorHeight = glutGet(GLUT_SCREEN_HEIGHT);
 
-    fprintf(stdout, "a");
-
     double f = 0.2;
     windowPosX = (int)(f * monitorWidth / 2);
     windowPosY = (int)(f * monitorHeight / 2);
@@ -117,26 +94,31 @@ void App::init(const char* title, bool fullscreen) {
     height = windowHeight;
 
     fprintf(stdout, "screen - width: %i, height: %i, x: %i, y: %i\n", monitorWidth, monitorHeight, windowPosX, windowPosY);
-    fprintf(stdout, "window - width: %i, height: %i\n", width, height);
+    // fprintf(stdout, "window - width: %i, height: %i\n", width, height);
 
     glutInitWindowSize(width, height);
     glutInitWindowPosition(windowPosX, windowPosY);
     
-    fprintf(stdout, "1");
     glutCreateWindow(title);
     // glutFullScreen();
 
     setCurrentInstance(this);
     ::glutDisplayFunc(drawCallback);
     ::glutIdleFunc(idleCallback);
+    ::glutReshapeFunc(reshapeCallback);
     ::glutKeyboardFunc(keyboardNormalCallback);
     ::glutSpecialFunc(keyboardSpecialCallback);
-    fprintf(stdout, "2");
 
 }
 
 void App::drawLoop() {
     // fprintf(stdout, "Drawing %i Particles\n", (int) physicsEngine->particles.size());
+    int size = std::min(width, height);
+
+    int x = (width - size) / 2;
+    int y = (height - size) / 2;
+
+    glViewport(x, y, size, size);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
@@ -152,6 +134,31 @@ void App::drawLoop() {
     glBegin(GL_POINTS);
     for (int i = 0; i < physicsEngine->particles.size(); i++) {
         ParticleOfLife::Particle p = physicsEngine->particles[i];
+        switch (p.type) {
+            default:
+            case 0:
+                glColor3f(1.0f, 1.0f, 1.0f);
+                break;
+            case 1:
+                glColor3f(1.0f, 1.0f, 0.0f);
+                break;
+            case 2:
+                glColor3f(1.0f, 0.0f, 1.0f);
+                break;
+            case 3:
+                glColor3f(0.0f, 1.0f, 1.0f);
+                break;
+            case 4:
+                glColor3f(1.0f, 0.0f, 0.0f);
+                break;
+            case 5:
+                glColor3f(0.0f, 1.0f, 0.0f);
+                break;
+            case 6:
+                glColor3f(0.0f, 0.0f, 1.0f);
+                break;
+        }
+
         glVertex2d(p.position.x, p.position.y);        
     }
     glEnd();

@@ -26,9 +26,11 @@ namespace ParticleOfLifeApp {
 		void drawLoop();
 		void idleLoop();
 
+
+		int width, height;
+
 	protected:
 		int window;
-		int width, height;
 		double mouseX = -1, mouseY = -1;
 		double preMouseX = mouseX, preMouseY = mouseY;
 						
@@ -63,6 +65,7 @@ void setCurrentInstance(ParticleOfLifeApp::App*);
 
 void drawCallback();
 void idleCallback();
+void reshapeCallback(int /*w*/, int /*h*/);
 void keyboardNormalCallback(unsigned char /*key*/, int /*x*/, int /*y*/);
 void keyboardSpecialCallback(int /*key*/, int /*x*/, int /*y*/);
 // void setupDrawCallback();

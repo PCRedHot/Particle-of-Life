@@ -50,7 +50,8 @@ void InteractionMatrix::randomize(double maxMag) {
             // values[i*n+j] = -maxMag + (rand() % static_cast<int>(2 * maxMag + 1));
             values[i*n+j] = (2 * maxMag) * ((double) rand() / (double) RAND_MAX ) - maxMag;
             fprintf(stdout, "(%i, %i): %f\n", i, j, values[i*n+j]);
-            types[i*n+j] = AccelerateType::UNIFORM;
+            // types[i*n+j] = AccelerateType::UNIFORM;
+            types[i*n+j] = AccelerateType::INVERSE;
         }
     }
 }

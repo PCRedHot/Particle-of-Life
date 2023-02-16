@@ -1,8 +1,5 @@
-cmake_minimum_required(VERSION 3.13.0)
-
 PROJECT(ParticleOfLife)
-
-# target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+cmake_minimum_required(VERSION 3.13.0)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,8 +19,6 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 add_subdirectory(src)
 
 # Linking Packages / Libraries
-## Packages
-# ### OpenGL, GLU, X11      # I dont think it is needed
 if (POLICY CMP0072)
     set(OpenGL_GL_PREFERENCE GLVND)
 endif()
@@ -46,19 +41,19 @@ target_include_directories(${PROJECT_NAME}
 )
 
 
-if (WIN32)
+# if (WIN32)
+# target_link_libraries(${PROJECT_NAME}
+#   ${OPENGL_LIBRARIES}
+#   ${GLUT_LIBRARY}
+#   glm::glm
+#   glu32
+#   opengl32
+#   freeglut
+# )
+# else()
 target_link_libraries(${PROJECT_NAME}
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARY}
   glm::glm
-  glu32
-  opengl32
-  freeglut
 )
-else()
-target_link_libraries(${PROJECT_NAME}
-  ${OPENGL_LIBRARIES}
-  ${GLUT_LIBRARY}
-  glm::glm
-)
-endif (WIN32)
+# endif (WIN32)

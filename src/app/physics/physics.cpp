@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <glm/vec2.hpp>
+#include <glm/glm.hpp>
 
 #include "range.h"
 #include "particle.h"
@@ -12,11 +13,11 @@
 using namespace ParticleOfLife::Physics;
 
 PhysicsSetting::PhysicsSetting() {
-    interactionMatrix = InteractionMatrix(TYPE_SIZE);
+    interactionMatrix.randomize(1);
 }
 
 PhysicsSetting::~PhysicsSetting() {
-    
+    fprintf(stdout, "Detroying Setting...\n");
 }
 
 PhysicsSetting PhysicsSetting::deepCopy() {
@@ -49,13 +50,15 @@ bool PhysicsSetting::operator!=(PhysicsSetting o) {
 
 
 PhysicsEngine::PhysicsEngine() {
-    setting = PhysicsSetting();
-    particles = std::vector<Particle>();
+    // fprintf(stdout, "physics setting... \n");
+    // setting = PhysicsSetting();
+    // fprintf(stdout, "Done\n");
+    // particles = std::vector<Particle>();
 }
 
-// PhysicsEngine::~PhysicsEngine() {
-//     // delete[] particles;
-// }
+PhysicsEngine::~PhysicsEngine() {
+    // delete[] particles;
+}
 
 
 void PhysicsEngine::calculateNxNy() {
@@ -82,22 +85,19 @@ void PhysicsEngine::setParticleCount(int num) {
 }
 
 void PhysicsEngine::simulate(double dt) {
-    fprintf(stdout, "Simulating");
     makeGrid();
 
     int nParticle = particles.size();
     // Update Velocity
-    // #pr agma om p parallel for
+    #pragma omp parallel for
     for (int i = 0; i < nParticle; i++) {
-
-        fprintf(stdout, "Simulating Particle %i", i);
-        Particle p = particles[i];
+        Particle* p = &particles[i];
 
         // Friction
-        p.velocity *= getFrictionFactor(dt);
+        p->velocity *= getFrictionFactor(dt);
 
-        int cx0 = (int) ((p.position.x + 1) / gridSize);
-        int cy0 = (int) ((p.position.y + 1) / gridSize);
+        int cx0 = (int) ((p->position.x + 1) / gridSize);
+        int cy0 = (int) ((p->position.y + 1) / gridSize);
 
         for (glm::ivec2 neighborGrid : gridNeighborhood) {
             int cx = wrapGrid(cx0 + neighborGrid.x, nx);
@@ -120,35 +120,36 @@ void PhysicsEngine::simulate(double dt) {
 
                 Particle q = particles[j];
 
-                glm::dvec2 relativePos = getRelativePosition(p.position, q.position);   
+                glm::dvec2 relativePos = getRelativePosition(p->position, q.position);   
                 
-                double mag = relativePos.length();
+                double mag = glm::length(relativePos);
+
                 if (mag > 0 && mag <= setting.rMax) {
                     relativePos /= setting.rMax;    // Scale for apply acceleration
-                    glm::dvec2 dv = ParticleOfLife::Physics::accelerate(setting.interactionMatrix.getType(p.type, q.type), setting.interactionMatrix.getValue(p.type, q.type), relativePos);
-                    p.velocity += dv * (setting.rMax * setting.forceScale * dt);
+                    glm::dvec2 dv = ParticleOfLife::Physics::accelerate(setting.interactionMatrix.getType(p->type, q.type), setting.interactionMatrix.getValue(p->type, q.type), relativePos);
+                    p->velocity += dv * (setting.rMax * setting.forceScale * dt);
                 }
             }
         }        
     }
 
-    fprintf(stdout, "Simulating 50%");
-
     // Update Position
-    // #pr agma om p parallel for
+    #pragma omp parallel for
     for (int i = 0; i < nParticle; i++) {
-        Particle p = particles[i];
-        p.position += p.velocity * dt;
-
+        Particle* p = &particles[i];
+        p->position += p->velocity * dt;
+        // if (i == 0) {
+        //     glm::dvec2 temp = p->velocity * dt;
+        //     fprintf(stdout, "dt: %f, v: %f, %f ... ", dt, temp->x, temp->y);
+        // }
+        
         // Ensure Position
         if (setting.wrap) {
-            Range::wrap(p.position);
+            Range::wrap(p->position);
         } else {
-            Range::clamp(p.position);
+            Range::clamp(p->position);
         }
     }
-
-    fprintf(stdout, "Simulated");
 }
 
 double PhysicsEngine::getFrictionFactor(double dt) {
@@ -175,6 +176,7 @@ void PhysicsEngine::makeGrid() {        // Put particles in the same grid togeth
 
     // Init Arrays
     std::vector<int>(nx*ny, 0).swap(grids);
+    if (particlesBuffer.size() != particles.size()) particlesBuffer = std::vector<Particle>(particles.size());
 
     for (Particle p : particles) {
         grids[getGridIndex(p)] += 1;
@@ -205,9 +207,9 @@ int PhysicsEngine::getGridIndex(glm::dvec2 pos) {
     int cx = (int) ((pos.x + 1) / gridSize);
     int cy = (int) ((pos.y + 1) / gridSize);
 
-    cx = std::min(cx, nx);
+    cx = std::min(cx, nx - 1);
     cx = std::max(cx, 0);
-    cy = std::min(cy, ny);
+    cy = std::min(cy, ny - 1);
     cy = std::max(cy, 0);
 
     return cx + cy * nx;

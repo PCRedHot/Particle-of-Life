@@ -15,8 +15,8 @@ double Range::wrap(double v) {
 };
 
 void Range::clamp(glm::dvec2& v) {
-    v.x = wrap(v.x);
-    v.y = wrap(v.y);
+    v.x = clamp(v.x);
+    v.y = clamp(v.y);
 }
 
 double Range::clamp(double v) {

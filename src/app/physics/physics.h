@@ -13,10 +13,10 @@ namespace ParticleOfLife {
                 PhysicsSetting();
                 ~PhysicsSetting();
 
-                InteractionMatrix interactionMatrix;
+                InteractionMatrix interactionMatrix = InteractionMatrix(TYPE_SIZE);
                 double rMax = 0.04;
                 double velocityHalfLife = 0.043;
-                double forceScale = 1.0f;
+                double forceScale = 1.0;
                         
                 bool wrap = true;       // Interaction at boarder and other side
                 
@@ -31,7 +31,7 @@ namespace ParticleOfLife {
         class PhysicsEngine {
             public:
                 PhysicsEngine();
-                // ~PhysicsEngine();
+                ~PhysicsEngine();
 
                 PhysicsSetting setting; // Setting of the physics rules
                 std::vector<Particle> particles;    // List of particles
@@ -47,7 +47,7 @@ namespace ParticleOfLife {
             private:
                 // Grid Buffers
                 std::vector<int> grids;
-                glm::ivec2 gridNeighborhood[9] {
+                const glm::ivec2 gridNeighborhood[9] {
                     glm::ivec2(-1, -1),
                     glm::ivec2( 0, -1),
                     glm::ivec2( 1, -1),

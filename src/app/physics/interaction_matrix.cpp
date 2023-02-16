@@ -14,19 +14,11 @@ InteractionMatrix::InteractionMatrix() : InteractionMatrix::InteractionMatrix(1)
 
 InteractionMatrix::InteractionMatrix(int size) {
     this->n = size;
-    values = new double*[n];
-    types = new AccelerateType*[n];
-    for (int i = 0; i < n; i++) {
-        values[i] = new double[n];
-        types[i] = new AccelerateType[n];
-    }
+    values = new double[n*n];
+    types = new AccelerateType[n*n];
 }
 
 InteractionMatrix::~InteractionMatrix() {
-    for (int i = 0; i < n; i++) {
-        delete[] values[i];
-        delete[] types[i];
-    }
     delete[] values;
     delete[] types;
 }
@@ -36,27 +28,29 @@ int InteractionMatrix::size() {
 }
 
 double InteractionMatrix::getValue(int i, int j) {
-    return values[i][j];
+    // fprintf(stdout, "Get Value of %i - %i: %f\n", i, j, values[i*n+j]);
+    return values[i*n+j];
 }
 
 void InteractionMatrix::setValue(int i, int j, double v) {
-    values[i][j] = v;
+    values[i*n+j] = v;
 }
 
 AccelerateType InteractionMatrix::getType(int i, int j) {
-    return types[i][j];
+    return types[i*n+j];
 }
 
 void InteractionMatrix::setType(int i, int j, AccelerateType v) {
-    types[i][j] = v;
+    types[i*n+j] = v;
 }
 
 void InteractionMatrix::randomize(double maxMag) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            // values[i][j] = -maxMag + (rand() % static_cast<int>(2 * maxMag + 1));
-            values[i][j] = -maxMag + 2 * maxMag * (double) rand() / RAND_MAX;
-            types[i][j] = AccelerateType::UNIFORM;
+            // values[i*n+j] = -maxMag + (rand() % static_cast<int>(2 * maxMag + 1));
+            values[i*n+j] = (2 * maxMag) * ((double) rand() / (double) RAND_MAX ) - maxMag;
+            fprintf(stdout, "(%i, %i): %f\n", i, j, values[i*n+j]);
+            types[i*n+j] = AccelerateType::UNIFORM;
         }
     }
 }

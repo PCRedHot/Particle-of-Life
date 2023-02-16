@@ -45,6 +45,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${GLUT_INCLUDE_DIRS}
 )
 
+
 if (WIN32)
 target_link_libraries(${PROJECT_NAME}
   ${OPENGL_LIBRARIES}

@@ -3,7 +3,7 @@
 // #include <windows.h>
 #include <GL/freeglut.h>
 
-#include "gui.h"
+// #include "gui.h"
 #include "physics/physics.h"
 
 namespace ParticleOfLifeApp {
@@ -13,10 +13,9 @@ namespace ParticleOfLifeApp {
 
 		App();
 
-		ParticleOfLife::Physics::PhysicsEngine physicsEngine;
+		ParticleOfLife::Physics::PhysicsEngine* physicsEngine;
 
 		void launch();
-		
 		
 		double tick();
 		// void processEvents();
@@ -25,6 +24,7 @@ namespace ParticleOfLifeApp {
 		void onPressSpecialKey(int /*key*/, int /*x*/, int /*y*/);
 
 		void drawLoop();
+		void idleLoop();
 
 	protected:
 		int window;
@@ -32,7 +32,7 @@ namespace ParticleOfLifeApp {
 		double mouseX = -1, mouseY = -1;
 		double preMouseX = mouseX, preMouseY = mouseY;
 						
-		AppGUI* gui;
+		// AppGUI* gui;
 		float guiScale = 1.0f;
 
 		// Window State
@@ -41,7 +41,7 @@ namespace ParticleOfLifeApp {
 	
 			
 		// Simulation State
-		bool isPlaying = false;
+		bool isPlaying = true;
 		int lastFrameTime = -1;
 	
 	private:
@@ -62,6 +62,7 @@ extern ParticleOfLifeApp::App* currentInstance;
 void setCurrentInstance(ParticleOfLifeApp::App*);
 
 void drawCallback();
+void idleCallback();
 void keyboardNormalCallback(unsigned char /*key*/, int /*x*/, int /*y*/);
 void keyboardSpecialCallback(int /*key*/, int /*x*/, int /*y*/);
 // void setupDrawCallback();

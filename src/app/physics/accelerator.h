@@ -10,41 +10,66 @@ namespace ParticleOfLife {
         //         virtual static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         // };
 
-        class Accelerator {
+        // class Accelerator {
+        //     public:
+        //        virtual glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        // class UniformAccelerator : public Accelerator {
+        //     public:
+        //         glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        // class InverseAccelerator : public Accelerator {
+        //     public:
+        //         glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        // class InverseSquareAccelerator : public Accelerator {
+        //     public:
+        //         glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        // class InverseCubeAccelerator : public Accelerator {
+        //     public:
+        //         glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        // class Rotate90Accelerator : public Accelerator {
+        //     public:
+        //         glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        // };
+
+        class UniformAccelerator {
             public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+                static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
-        class UniformAccelerator : public Accelerator {
+        class InverseAccelerator {
             public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+                static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
-        class InverseAccelerator : public Accelerator {
+        class InverseSquareAccelerator {
             public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+                static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
-        class InverseSquareAccelerator : public Accelerator {
+        class InverseCubeAccelerator {
             public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+                static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
-        class InverseCubeAccelerator : public Accelerator {
+        class Rotate90Accelerator {
             public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
-        };
-
-        class Rotate90Accelerator : public Accelerator {
-            public:
-                glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+                static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
         enum class AccelerateType {
             UNIFORM, INVERSE, INVERSE_SQUARE, INVERSE_CUBE, ROTATE_90
         };
 
-        extern std::map<AccelerateType, Accelerator> acceleratorTypeMap;
+        // extern std::map<AccelerateType, Accelerator*> acceleratorTypeMap;
 
         glm::dvec2 accelerate(AccelerateType /*type*/, double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
     }

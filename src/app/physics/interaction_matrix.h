@@ -27,8 +27,8 @@ namespace ParticleOfLife {
             private:
                 int n; // size
 
-                double **values;
-                AccelerateType **types;
+                double *values;
+                AccelerateType *types;
         };
     }
 }

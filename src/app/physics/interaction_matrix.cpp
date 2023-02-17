@@ -3,6 +3,7 @@
 #include <iterator> 
 #include <glm/vec3.hpp>
 #include <random>
+#include <string>
 
 #include "accelerator.h"
 #include "interaction_matrix.h"
@@ -14,8 +15,10 @@ InteractionMatrix::InteractionMatrix() : InteractionMatrix::InteractionMatrix(1)
 
 InteractionMatrix::InteractionMatrix(int size) {
     this->n = size;
-    values = new double[n*n];
+    values = new float[n*n];
     types = new AccelerateType[n*n];
+    
+    resetType();
 }
 
 InteractionMatrix::~InteractionMatrix() {
@@ -27,38 +30,69 @@ int InteractionMatrix::size() {
     return n;
 }
 
-double InteractionMatrix::getValue(int i, int j) {
-    // fprintf(stdout, "Get Value of %i - %i: %f\n", i, j, values[i*n+j]);
+float InteractionMatrix::getValue(int i, int j) {
+    // if (isSymmetric && j > i) return values[j*n + i]; 
     return values[i*n+j];
 }
 
+float* InteractionMatrix::getValuePointer(int i, int j) {
+    if (isSymmetric && j > i) return &(values[j*n + i]); 
+    return &(values[i*n+j]);
+}
+
 void InteractionMatrix::setValue(int i, int j, double v) {
+    if (isSymmetric && j > i) values[j*n+i] = v;
     values[i*n+j] = v;
 }
 
 AccelerateType InteractionMatrix::getType(int i, int j) {
+    if (isSymmetric && j > i) return types[j*n + i]; 
     return types[i*n+j];
 }
 
 void InteractionMatrix::setType(int i, int j, AccelerateType v) {
+    if (isSymmetric && j > i) types[j*n+i] = v;
     types[i*n+j] = v;
+    // if (isSymmetric) types[j*n+i] = v;
 }
 
-void InteractionMatrix::randomize(double maxMag) {
+void InteractionMatrix::randomizeValue(double maxMag) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            // values[i*n+j] = -maxMag + (rand() % static_cast<int>(2 * maxMag + 1));
-            values[i*n+j] = (2 * maxMag) * ((double) rand() / (double) RAND_MAX ) - maxMag;
-            fprintf(stdout, "(%i, %i): %f\n", i, j, values[i*n+j]);
-            // types[i*n+j] = AccelerateType::UNIFORM;
-            types[i*n+j] = AccelerateType::INVERSE;
+            values[i*n+j] = (2 * maxMag) * ((double) rand() / (double) RAND_MAX) - maxMag;
         }
     }
+}
+
+void InteractionMatrix::resetValue() {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            values[i*n+j] = 0.0f;
+        }
+    }
+}
+
+void InteractionMatrix::resetType() {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) types[i*n+j] = AccelerateType::UNIFORM;
+            else types[i*n+j] = AccelerateType::INVERSE;
+        }
+    }
+}
+
+void InteractionMatrix::setSymmetric(bool v) {
+    isSymmetric = v;
+}
+
+bool* InteractionMatrix::getSymmetricControlPointer() {
+    return &isSymmetric;
 }
 
 InteractionMatrix InteractionMatrix::deepCopy() {
     InteractionMatrix rtnCopy = InteractionMatrix(n);
 
+    rtnCopy.setSymmetric(isSymmetric);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             rtnCopy.setValue(i, j, getValue(i, j));
@@ -103,6 +137,7 @@ InteractionMatrix InteractionMatrix::extract(int *indices){
 bool InteractionMatrix::operator==(InteractionMatrix o) {
     if (n != o.n) return false;
 
+    if (o.isSymmetric != isSymmetric) return false;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (getValue(i, j) != o.getValue(i, j)) return false;

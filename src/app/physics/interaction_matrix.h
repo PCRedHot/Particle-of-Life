@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "accelerator.h"
 
 namespace ParticleOfLife {
@@ -11,12 +13,18 @@ namespace ParticleOfLife {
                 ~InteractionMatrix();
 
                 int size();
-                double getValue(int /*i*/, int /*j*/);
+                float getValue(int /*i*/, int /*j*/);
+                float* getValuePointer(int /*i*/, int /*j*/);
                 AccelerateType getType(int /*i*/, int /*j*/);
 
                 void setValue(int /*i*/, int /*j*/, double /*v*/);
                 void setType(int /*i*/, int /*j*/, AccelerateType /*v*/);
-                void randomize(double /*maxMag*/);
+                void resetValue();
+                void resetType();
+                void randomizeValue(double /*maxMag*/);
+
+                void setSymmetric(bool /*v*/);
+                bool* getSymmetricControlPointer();
 
                 InteractionMatrix deepCopy();
                 InteractionMatrix extract(int* /*indices*/);
@@ -26,8 +34,9 @@ namespace ParticleOfLife {
             
             private:
                 int n; // size
+                bool isSymmetric = false;
 
-                double *values;
+                float *values;
                 AccelerateType *types;
         };
     }

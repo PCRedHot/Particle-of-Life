@@ -50,7 +50,7 @@ App::App() {
     fprintf(stdout, "Making App\n");
     // fprintf(stdout, "Making physicsEngine\n");
     physicsEngine = new ParticleOfLife::Physics::PhysicsEngine();
-    physicsEngine->setParticleCount(40000);
+    physicsEngine->setParticleCount(30000);
 }
 
 App::~App() {
@@ -90,11 +90,13 @@ void App::init(const char* title, bool fullscreen) {
     int monitorWidth = glutGet(GLUT_SCREEN_WIDTH);
     int monitorHeight = glutGet(GLUT_SCREEN_HEIGHT);
 
-    double f = 0.2;
+    double f = 0.5;
     windowPosX = (int)(f * monitorWidth / 2);
     windowPosY = (int)(f * monitorHeight / 2);
     windowWidth = (int)((1 - f) * monitorWidth);
     windowHeight = (int)((1 - f) * monitorHeight);
+
+    int size = std::min(windowWidth, windowHeight);
 
     // boxWidth = windowWidth;
     // boxHeight = windowHeight;
@@ -102,7 +104,7 @@ void App::init(const char* title, bool fullscreen) {
     // fprintf(stdout, "screen - width: %i, height: %i, x: %i, y: %i\n", monitorWidth, monitorHeight, windowPosX, windowPosY);
     // fprintf(stdout, "window - width: %i, height: %i\n", width, height);
 
-    glutInitWindowSize(windowWidth, windowHeight);
+    glutInitWindowSize(size, size);
     glutInitWindowPosition(windowPosX, windowPosY);
     
     glutCreateWindow(title);
@@ -129,40 +131,14 @@ void App::init(const char* title, bool fullscreen) {
     ImGui_ImplGLUT_InstallFuncs();
 }
 
+bool show_demo_window = true;
+
 void App::drawLoop() {
-     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGLUT_NewFrame();
-
-    {   // GUI
-        ImGui::SetNextWindowSize(ImVec2(500, 0));
-        ImGui::Begin("Controls");
-
-        ImGui::Text("Types:");
-        
-        for (int i = 0; i < physicsEngine->setting.typeCount; i++) {
-            if (ImGui::Button("X")) {}
-            ImGui::SameLine();
-            ImGui::ColorEdit3(std::to_string(i).c_str(), physicsEngine->setting.typeColour[i]);
-        }
-        ImVec2 v = ImGui::GetWindowSize();  // v = {32, 48} ,   is tool small
-ImGui::Text("%f %f", v.x, v.y);
-if (ImGui::GetFrameCount() < 10)
-    printf("Frame %d: Size %f %f\n", ImGui::GetFrameCount(), v.x, v.y);
-ImGui::End();
-    }
-
-    // Rendering
-    ImGui::Render();
-    ImGuiIO& io = ImGui::GetIO();
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
 
-    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-
+    
     // fprintf(stdout, "Drawing %i Particles\n", (int) physicsEngine->particles.size());
     windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
@@ -174,16 +150,155 @@ ImGui::End();
 
     glViewport(x, y, size, size);
 
-    
-
     glBegin(GL_POINTS);
     for (int i = 0; i < physicsEngine->particles.size(); i++) {
         ParticleOfLife::Particle p = physicsEngine->particles[i];
         float* colour = physicsEngine->setting.typeColour[p.type];
-        glColor3f(colour[0], colour[1], colour[3]);
+        glColor3f(colour[0], colour[1], colour[2]);
         glVertex2d(p.position.x, p.position.y);        
     }
     glEnd();
+
+
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGLUT_NewFrame();
+
+    ImGui::ShowDemoWindow(&show_demo_window);
+
+    int typeCount = physicsEngine->setting.typeCount;
+    {   // Control GUI
+        ImGui::SetNextWindowSize(ImVec2(500, 0));
+        ImGui::Begin("Controls");
+
+        if (ImGui::CollapsingHeader("Types")) {
+            for (int i = 0; i < typeCount; i++) {
+                ImGui::PushID(i);
+                if (ImGui::Button("X")) {
+                    // TODO delete type i
+                }
+                ImGui::SameLine();
+                ImGui::ColorEdit3("", physicsEngine->setting.typeColour[i]);
+                ImGui::PopID();
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Interactions")) {
+            ImGui::SeparatorText("Options");
+            ImGui::Checkbox("Symmetric Interactions", physicsEngine->setting.interactionMatrix.getSymmetricControlPointer());
+            ImGui::SeparatorText("Interaction Mode");
+            ImGui::PushID("Mode");
+            if (ImGui::Button("Reset")) physicsEngine->setting.interactionMatrix.resetType();
+            static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_NoHostExtendX;
+            if (ImGui::BeginTable("Interaction Mode", typeCount + 1, flags)) {
+                for (int row = 0; row < typeCount + 1; row++) {
+                    ImGui::TableNextRow();
+
+                    if (row == 0) {     // First Row
+                        for (int column = 1; column < typeCount + 1; column++) {
+                            ImGui::TableSetColumnIndex(column);
+                            // ImGui::Text("Type %c", '0' + column);
+                            ImGui::Text(" ");
+
+                            float* typeColour = physicsEngine->setting.typeColour[column-1];
+                            ImU32 cellBgColour = ImGui::GetColorU32(ImVec4(typeColour[0], typeColour[1], typeColour[2], 1.0f));
+                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, cellBgColour, column);
+                        }
+                    } else {
+                        for (int column = 0; column < typeCount + 1; column++) {
+                            ImGui::TableSetColumnIndex(column);
+
+                            if (column == 0) { // First Column
+                                ImGui::Text(" ");
+
+                                float* typeColour = physicsEngine->setting.typeColour[row-1];
+                                ImU32 cellBgColour = ImGui::GetColorU32(ImVec4(typeColour[0], typeColour[1], typeColour[2], 1.0f));
+                                ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, cellBgColour, column);
+                            } else {
+                                int matrixI = row - 1;
+                                int matrixJ = column - 1;
+
+                                ImGui::PushID(matrixI);
+                                ImGui::PushID(matrixJ);
+                                ParticleOfLife::Physics::AccelerateType curType = physicsEngine->setting.interactionMatrix.getType(matrixI, matrixJ);
+                                if (ImGui::Button(std::to_string((int) curType).c_str())) {
+                                    physicsEngine->setting.interactionMatrix.setType(
+                                        matrixI, matrixJ, 
+                                        (ParticleOfLife::Physics::AccelerateType) (((int) curType + 1) % (int) ParticleOfLife::Physics::AccelerateType::Count)
+                                    );
+                                }
+                                ImGui::PopID();
+                                ImGui::PopID();
+                            }
+                        }
+                    }                    
+                }
+                ImGui::EndTable();
+                ImGui::SameLine();
+
+                ImGui::TextWrapped("%s", ParticleOfLife::Physics::getAccelerateTypeDescription().c_str());
+            }
+            ImGui::PopID();
+            
+            ImGui::SeparatorText("Interaction Factor");
+            ImGui::PushID("Factor");
+            if (ImGui::Button("Reset")) physicsEngine->setting.interactionMatrix.resetValue();
+            ImGui::SameLine();
+            if (ImGui::Button("Randomize")) physicsEngine->setting.interactionMatrix.randomizeValue(1);
+            if (ImGui::BeginTable("Interaction Factor", typeCount + 1, flags)) {
+                for (int row = 0; row < typeCount + 1; row++) {
+                    ImGui::TableNextRow();
+
+                    if (row == 0) {     // First Row
+                        for (int column = 1; column < typeCount + 1; column++) {
+                            ImGui::TableSetColumnIndex(column);
+                            // ImGui::Text("Type %c", '0' + column);
+                            ImGui::Text(" ");
+
+                            float* typeColour = physicsEngine->setting.typeColour[column-1];
+                            ImU32 cellBgColour = ImGui::GetColorU32(ImVec4(typeColour[0], typeColour[1], typeColour[2], 1.0f));
+                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, cellBgColour, column);
+                        }
+                    } else {
+                        for (int column = 0; column < typeCount + 1; column++) {
+                            ImGui::TableSetColumnIndex(column);
+
+                            if (column == 0) { // First Column
+                                ImGui::Text(" ");
+
+                                float* typeColour = physicsEngine->setting.typeColour[row-1];
+                                ImU32 cellBgColour = ImGui::GetColorU32(ImVec4(typeColour[0], typeColour[1], typeColour[2], 1.0f));
+                                ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, cellBgColour, column);
+                            } else {
+                                int matrixI = row - 1;
+                                int matrixJ = column - 1;
+
+                                ImGui::PushID(matrixI);
+                                ImGui::PushID(matrixJ);
+                                ImGui::SetNextItemWidth(40);
+                                float curType = physicsEngine->setting.interactionMatrix.getValue(matrixI, matrixJ);
+                                // ImGui::DragFloat(std::to_string(curType).c_str(), physicsEngine->setting.interactionMatrix.getValuePointer(matrixI, matrixJ), 0.005f, -1.0f, 1.0f, "%.3f");
+                                ImGui::DragFloat("", physicsEngine->setting.interactionMatrix.getValuePointer(matrixI, matrixJ), 0.005f, -1.0f, 1.0f, "%.2f");
+                                ImGui::PopID();
+                                ImGui::PopID();
+                            }
+                        }
+                    }                    
+                }
+                ImGui::EndTable();
+            }
+            ImGui::PopID();
+        }
+        
+        ImGui::End();
+    }
+
+    // Rendering 
+    ImGui::Render();
+    ImGuiIO& io = ImGui::GetIO();
+
+    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
     glFlush();
@@ -195,7 +310,8 @@ void App::idleLoop() {
 
     try {
         // fprintf(stdout, "Simulating dt = %f... ", dt);
-        physicsEngine->simulate(dt);
+        // physicsEngine->simulate(dt);
+        physicsEngine->simulate(25.0f/1000);
         // fprintf(stdout, "Done\n");
     } catch (...) {
         fprintf(stderr, "ERROR when simulating\n");

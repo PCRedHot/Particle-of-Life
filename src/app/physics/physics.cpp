@@ -13,7 +13,7 @@
 using namespace ParticleOfLife::Physics;
 
 PhysicsSetting::PhysicsSetting() {
-    interactionMatrix.randomize(1);
+    interactionMatrix.randomizeValue(1);
     typeColour.push_back(new float[3]{1.0f, 1.0f, 1.0f});
     typeColour.push_back(new float[3]{1.0f, 1.0f, 0.0f});
     typeColour.push_back(new float[3]{1.0f, 0.0f, 1.0f});
@@ -74,7 +74,7 @@ void PhysicsEngine::calculateNxNy() {
 }
 
 void PhysicsEngine::generateInteractionMatrix() {
-    setting.interactionMatrix.randomize(1);
+    setting.interactionMatrix.randomizeValue(1);
 }
 
 int PhysicsEngine::getTypeCount() {
@@ -134,6 +134,7 @@ void PhysicsEngine::simulate(double dt) {
                 if (mag > 0 && mag <= setting.rMax) {
                     relativePos /= setting.rMax;    // Scale for apply acceleration
                     glm::dvec2 dv = ParticleOfLife::Physics::accelerate(setting.interactionMatrix.getType(p->type, q.type), setting.interactionMatrix.getValue(p->type, q.type), relativePos);
+                    // fprintf(stdout, "dt: %f, v: %f, %f ... \n", dt, dv.x, dv.y);
                     p->velocity += dv * (setting.rMax * setting.forceScale * dt);
                 }
             }
@@ -145,6 +146,7 @@ void PhysicsEngine::simulate(double dt) {
     for (int i = 0; i < nParticle; i++) {
         Particle* p = &particles[i];
         p->position += p->velocity * dt;
+        // fprintf(stdout, "dt: %f, v: %f, %f ... \n", dt, p->velocity.x, p->velocity.y);
         // if (i == 0) {
         //     glm::dvec2 temp = p->velocity * dt;
         //     fprintf(stdout, "dt: %f, v: %f, %f ... ", dt, temp->x, temp->y);

@@ -65,12 +65,15 @@ namespace ParticleOfLife {
                 static glm::dvec2 accelerate(double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
         };
 
-        enum class AccelerateType {
-            UNIFORM, INVERSE, INVERSE_SQUARE, INVERSE_CUBE, ROTATE_90
+        enum class AccelerateType : int {
+            UNIFORM, INVERSE, INVERSE_SQUARE, INVERSE_CUBE, ROTATE_90, Count
         };
 
         // extern std::map<AccelerateType, Accelerator*> acceleratorTypeMap;
 
         glm::dvec2 accelerate(AccelerateType /*type*/, double /*typeInteraction*/, glm::dvec2 /*relativePos*/);
+        
+        std::string getAccelerateTypeString(AccelerateType /*type*/);
+        std::string getAccelerateTypeDescription();
     }
 }

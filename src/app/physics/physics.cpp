@@ -14,13 +14,13 @@ using namespace ParticleOfLife::Physics;
 
 PhysicsSetting::PhysicsSetting() {
     interactionMatrix.randomizeValue(1);
-    typeColour.push_back(new float[3]{1.0f, 1.0f, 1.0f});
-    typeColour.push_back(new float[3]{1.0f, 1.0f, 0.0f});
-    typeColour.push_back(new float[3]{1.0f, 0.0f, 1.0f});
-    typeColour.push_back(new float[3]{0.0f, 1.0f, 1.0f});
-    typeColour.push_back(new float[3]{1.0f, 0.0f, 0.0f});
-    typeColour.push_back(new float[3]{0.0f, 1.0f, 0.0f});
-    typeColour.push_back(new float[3]{0.0f, 0.0f, 1.0f});
+    typeColour.push_back(new float[4]{1.0f, 1.0f, 1.0f, 1.0f});
+    typeColour.push_back(new float[4]{1.0f, 1.0f, 0.0f, 1.0f});
+    typeColour.push_back(new float[4]{1.0f, 0.0f, 1.0f, 1.0f});
+    typeColour.push_back(new float[4]{0.0f, 1.0f, 1.0f, 1.0f});
+    typeColour.push_back(new float[4]{1.0f, 0.0f, 0.0f, 1.0f});
+    typeColour.push_back(new float[4]{0.0f, 1.0f, 0.0f, 1.0f});
+    typeColour.push_back(new float[4]{0.0f, 0.0f, 1.0f, 1.0f});
 }
 
 PhysicsSetting::~PhysicsSetting() {

@@ -50,7 +50,7 @@ App::App() {
     fprintf(stdout, "Making App\n");
     // fprintf(stdout, "Making physicsEngine\n");
     physicsEngine = new ParticleOfLife::Physics::PhysicsEngine();
-    physicsEngine->setParticleCount(30000);
+    physicsEngine->setParticleCount(DEFAULT_PARTICLE_NUM);
 }
 
 App::~App() {
@@ -170,15 +170,24 @@ void App::drawLoop() {
     {   // Control GUI
         ImGui::SetNextWindowSize(ImVec2(500, 0));
         ImGui::Begin("Controls");
+        if (ImGui::CollapsingHeader("Parameters")) {
+            ImGui::InputInt("Number of Particles", &_inputParticleNum);
+            ImGui::SameLine();
+            if (ImGui::Button("Apply")) {
+                physicsEngine->setParticleCount(_inputParticleNum);
+            } 
+        }
 
-        if (ImGui::CollapsingHeader("Types")) {
+        if (ImGui::CollapsingHeader("Particle Types")) {
             for (int i = 0; i < typeCount; i++) {
                 ImGui::PushID(i);
                 if (ImGui::Button("X")) {
                     // TODO delete type i
                 }
                 ImGui::SameLine();
-                ImGui::ColorEdit3("", physicsEngine->setting.typeColour[i]);
+                // float* colour = physicsEngine->setting.typeColour[i];
+                // bool open_popup = ImGui::ColorButton("", ImVec4(colour[0], colour[1], colour[2], colour[3]), misc_flags);
+                ImGui::ColorEdit3(std::string("Type ").append(std::to_string(i)).c_str(), physicsEngine->setting.typeColour[i], ImGuiColorEditFlags_NoLabel);
                 ImGui::PopID();
             }
         }
@@ -311,7 +320,8 @@ void App::idleLoop() {
     try {
         // fprintf(stdout, "Simulating dt = %f... ", dt);
         // physicsEngine->simulate(dt);
-        physicsEngine->simulate(25.0f/1000);
+        double maxDt = 25.0 / 1000;
+        physicsEngine->simulate(std::min(dt, maxDt));
         // fprintf(stdout, "Done\n");
     } catch (...) {
         fprintf(stderr, "ERROR when simulating\n");

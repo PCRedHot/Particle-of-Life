@@ -9,6 +9,8 @@
 namespace ParticleOfLifeApp {
 	class App {
 	public:
+		const int DEFAULT_PARTICLE_NUM = 30000;
+		
 		~App();
 
 		App();
@@ -45,6 +47,13 @@ namespace ParticleOfLifeApp {
 
 		const double minZoom = 1;
 		const double maxZoom = 10;
+
+		// GUI State
+		
+
+		
+
+		int _inputParticleNum = DEFAULT_PARTICLE_NUM;
 	};
 
 	

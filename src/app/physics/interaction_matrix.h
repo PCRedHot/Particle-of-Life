@@ -26,8 +26,11 @@ namespace ParticleOfLife {
                 void setSymmetric(bool /*v*/);
                 bool* getSymmetricControlPointer();
 
+                void addType();
+                void removeType(int /*i*/);
+
                 InteractionMatrix deepCopy();
-                InteractionMatrix extract(int* /*indices*/);
+                // InteractionMatrix extract(int* /*indices*/);
 
                 bool operator==(InteractionMatrix /*o*/);
                 bool operator!=(InteractionMatrix /*o*/);

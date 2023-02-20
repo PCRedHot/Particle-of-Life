@@ -164,7 +164,7 @@ void App::drawLoop() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGLUT_NewFrame();
 
-    ImGui::ShowDemoWindow(&show_demo_window);
+    // ImGui::ShowDemoWindow(&show_demo_window);
 
     int typeCount = physicsEngine->setting.typeCount;
     {   // Control GUI
@@ -182,13 +182,16 @@ void App::drawLoop() {
             for (int i = 0; i < typeCount; i++) {
                 ImGui::PushID(i);
                 if (ImGui::Button("X")) {
-                    // TODO delete type i
+                    physicsEngine->removeType(i);
                 }
                 ImGui::SameLine();
                 // float* colour = physicsEngine->setting.typeColour[i];
                 // bool open_popup = ImGui::ColorButton("", ImVec4(colour[0], colour[1], colour[2], colour[3]), misc_flags);
                 ImGui::ColorEdit3(std::string("Type ").append(std::to_string(i)).c_str(), physicsEngine->setting.typeColour[i], ImGuiColorEditFlags_NoLabel);
                 ImGui::PopID();
+            }
+            if (ImGui::Button("+")) {
+                physicsEngine->addType();
             }
         }
 

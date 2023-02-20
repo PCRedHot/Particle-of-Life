@@ -103,36 +103,90 @@ InteractionMatrix InteractionMatrix::deepCopy() {
     return rtnCopy;
 }
 
-InteractionMatrix InteractionMatrix::extract(int *indices){
-    int newSize = sizeof(indices)/sizeof(int);
-    assert (newSize > 0 && "Extracted Matrix has negative size!");
+void InteractionMatrix::removeType(int remove_index) {
+    int new_n = n - 1;
+    float* new_values = new float[new_n*new_n];
+    AccelerateType* new_types = new AccelerateType[new_n*new_n];
 
-    InteractionMatrix rtnMatrix = InteractionMatrix(newSize);
-    
     int ni = 0, nj = 0;
     for (int i = 0; i < size(); i++) {
-        bool existsI = std::any_of(indices, indices + newSize, [&](int v) {
-            return v == i;
-        });
-        if (!existsI) continue;
-                
+        if (remove_index == i) continue;
         nj = 0;
         for (int j = 0; j < size(); j++) {
-            bool existsJ = std::any_of(indices, indices + newSize, [&](int v) {
-                return v == j;
-            });
-            if (!existsJ) continue;
+            if (remove_index == j) continue;
 
-            rtnMatrix.setValue(ni, nj, getValue(i, j));
-            rtnMatrix.setType(ni, nj, getType(i, j));
+            new_values[ni*new_n + nj] = values[i*n + j];
+            new_types[ni*new_n + nj] = types[i*n + j];
 
             nj += 1;
         }
         ni += 1;
     }
 
-    return rtnMatrix;
-}
+    n = new_n;
+    delete[] values;
+    delete[] types;
+
+    values = new_values;
+    types = new_types;
+} 
+
+void InteractionMatrix::addType() {
+    int new_n = n + 1;
+    float* new_values = new float[new_n*new_n];
+    AccelerateType* new_types = new AccelerateType[new_n*new_n];
+
+    for (int i = 0; i < new_n; i++) {
+        for (int j = 0; j < new_n; j++) {
+            if (i == new_n - 1 || j == new_n - 1) {
+                new_values[i*new_n + j] = 0;
+                if (i == j) new_types[i*new_n + j] = AccelerateType::UNIFORM;
+                else new_types[i*new_n + j] = AccelerateType::INVERSE;
+            } else {
+                new_values[i*new_n + j] = values[i*n + j];
+                new_types[i*new_n + j] = types[i*n + j];
+            }            
+        }
+    }
+
+    n = new_n;
+    delete[] values;
+    delete[] types;
+
+    values = new_values;
+    types = new_types;
+} 
+
+// InteractionMatrix InteractionMatrix::extract(int *indices){
+//     int newSize = sizeof(indices)/sizeof(int);
+//     assert (newSize > 0 && "Extracted Matrix has negative size!");
+
+//     InteractionMatrix rtnMatrix = InteractionMatrix(newSize);
+    
+//     int ni = 0, nj = 0;
+//     for (int i = 0; i < size(); i++) {
+//         bool existsI = std::any_of(indices, indices + newSize, [&](int v) {
+//             return v == i;
+//         });
+//         if (!existsI) continue;
+                
+//         nj = 0;
+//         for (int j = 0; j < size(); j++) {
+//             bool existsJ = std::any_of(indices, indices + newSize, [&](int v) {
+//                 return v == j;
+//             });
+//             if (!existsJ) continue;
+
+//             rtnMatrix.setValue(ni, nj, getValue(i, j));
+//             rtnMatrix.setType(ni, nj, getType(i, j));
+
+//             nj += 1;
+//         }
+//         ni += 1;
+//     }
+
+//     return rtnMatrix;
+// }
 
 bool InteractionMatrix::operator==(InteractionMatrix o) {
     if (n != o.n) return false;

@@ -13,6 +13,9 @@ namespace ParticleOfLife {
                 PhysicsSetting();
                 ~PhysicsSetting();
 
+                void removeType(int /*i*/);
+                void addType();
+
                 InteractionMatrix interactionMatrix = InteractionMatrix(DEFAULT_TYPE_SIZE);
                 double rMax = 0.04;
                 double velocityHalfLife = 0.043;
@@ -46,6 +49,9 @@ namespace ParticleOfLife {
                 
 
                 void simulate(double /*dt*/);
+
+                void addType();
+                void removeType(int /*i*/);
                 
 
             private:

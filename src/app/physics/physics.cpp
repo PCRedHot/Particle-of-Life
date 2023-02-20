@@ -27,6 +27,19 @@ PhysicsSetting::~PhysicsSetting() {
     fprintf(stdout, "Detroying Setting...\n");
 }
 
+void PhysicsSetting::removeType(int i) {
+    typeColour.erase(typeColour.begin() + i);
+    interactionMatrix.removeType(i);
+    typeCount -= 1;
+}
+
+void PhysicsSetting::addType() {
+    typeColour.push_back(new float[4]{1.0f, 1.0f, 1.0f, 1.0f});
+    interactionMatrix.addType();
+    typeCount += 1;
+}
+
+
 PhysicsSetting PhysicsSetting::deepCopy() {
     PhysicsSetting rtnCopy = PhysicsSetting();
 
@@ -160,6 +173,33 @@ void PhysicsEngine::simulate(double dt) {
         }
     }
 }
+
+void PhysicsEngine::addType() {
+    // Update Setting
+    setting.addType();
+
+    // Update Particles
+    float prob = 1.0f / setting.typeCount;
+    for (int i = 0; i < particles.size(); i++) {
+        Particle* p = &particles[i];
+        if ((float) rand() / RAND_MAX < prob) p->type = setting.typeCount - 1;
+    }   
+
+}
+
+void PhysicsEngine::removeType(int remove_index) {
+    // Update Setting
+    setting.removeType(remove_index);
+
+    // Update Particles
+    for (int i = 0; i < particles.size(); i++) {
+        Particle* p = &particles[i];
+        if (p->type == remove_index) p->type = rand() % setting.typeCount;
+        else if (p->type > remove_index) p->type = p->type - 1;
+    }   
+
+}
+
 
 double PhysicsEngine::getFrictionFactor(double dt) {
     if (setting.velocityHalfLife == 0) return 0;

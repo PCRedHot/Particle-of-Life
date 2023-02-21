@@ -114,9 +114,9 @@ void App::init(const char* title, bool fullscreen) {
     ::glutDisplayFunc(drawCallback);
     ::glutIdleFunc(idleCallback);
     ::glutReshapeFunc(reshapeCallback);
-    ::glutMouseFunc(mouseCallback);
-    ::glutKeyboardFunc(keyboardNormalCallback);
-    ::glutSpecialFunc(keyboardSpecialCallback);
+    // ::glutMouseFunc(mouseCallback);
+    // ::glutKeyboardFunc(keyboardNormalCallback);
+    // ::glutSpecialFunc(keyboardSpecialCallback);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -168,14 +168,28 @@ void App::drawLoop() {
 
     int typeCount = physicsEngine->setting.typeCount;
     {   // Control GUI
-        ImGui::SetNextWindowSize(ImVec2(500, 0));
+        ImGui::SetNextWindowSize(ImVec2(700, 0));
         ImGui::Begin("Controls");
+        
+        if (isPlaying) {
+            if (ImGui::Button("Pause")) isPlaying = false;
+        } else {
+            if (ImGui::Button("Play")) isPlaying = true;
+        }
+        ImGui::SameLine();
+        ImGui::Text("Simulation");
+
+
         if (ImGui::CollapsingHeader("Parameters")) {
             ImGui::InputInt("Number of Particles", &_inputParticleNum);
             ImGui::SameLine();
             if (ImGui::Button("Apply")) {
                 physicsEngine->setParticleCount(_inputParticleNum);
             } 
+
+            ImGui::DragFloat("rMax", &physicsEngine->setting.rMax, 0.001f, 0.01f, 0.1f);
+            ImGui::DragFloat("forceScale", &physicsEngine->setting.forceScale, 0.01f, 0.0f, 10.0f);
+            ImGui::DragFloat("velocityHalfLife", &physicsEngine->setting.velocityHalfLife, 0.001f, 0.0f, std::numeric_limits<float>::infinity());
         }
 
         if (ImGui::CollapsingHeader("Particle Types")) {

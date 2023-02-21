@@ -17,9 +17,9 @@ namespace ParticleOfLife {
                 void addType();
 
                 InteractionMatrix interactionMatrix = InteractionMatrix(DEFAULT_TYPE_SIZE);
-                double rMax = 0.04;
-                double velocityHalfLife = 0.043;
-                double forceScale = 1.0;
+                float rMax = 0.04;
+                float velocityHalfLife = 0.043;
+                float forceScale = 1.0;
                         
                 bool wrap = true;       // Interaction at boarder and other side
                 

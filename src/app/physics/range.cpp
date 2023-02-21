@@ -11,7 +11,7 @@ void Range::wrap(glm::dvec2& v) {
 }
 
 double Range::wrap(double v) {
-    return std::fmod(v + 1, 2) - 1;
+    return std::fmod(v + 3, 2) - 1;
 };
 
 void Range::clamp(glm::dvec2& v) {
